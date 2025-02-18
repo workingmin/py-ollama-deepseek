@@ -27,5 +27,4 @@ if __name__ == '__main__':
     messages.append(message)
     
     response = client.chat(model=ollama_model, messages=messages)
-    # print(response.get('message').get('content'))
-    print(response)
+    print(response.get('message').get('content'))
