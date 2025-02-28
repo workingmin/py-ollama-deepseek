@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Ollama-DeepSeek-Stream-Demo</title>
+    </head>
+    <body>
+        <h1>Ollama DeepSeek Stream Demo</h1>
+                
+        Chat:
+        <br>
+        <input type="text" style="width: 400px;" id="message" name="Message" value="请你用Python编写一个功能强大的爬虫，功能至少要有图片爬取等"/>
+        <input type="submit" onclick="chat()" value="chat"/>
+        <br>
+        <label id="error"></label>
+        <br>
+                
+        <div id="output" style="border: 1px; padding: 10px;"></div>
+        <script>
+            async function chat() {
+                const outputDiv = document.getElementById('output')
+                const errorDiv = document.getElementById("error");
+                errorDiv.value = "";
+                
+                const messageDiv = document.getElementById('message')
+                const message = messageDiv.value
+                
+                if(message === undefined || message === null || message === "" || message.trim().length == 0) {
+                    errorDiv.innerHTML = "Chat message is required";
+                    return
+                }
+
+                try {
+                    const response = await fetch('/stream', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: message
+                        })
+                    });
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let result = ''
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done)
+                            break;
+
+                        const chunk = decoder.decode(value)
+                        const lines = chunk.split('\n\n').filter(line => line.startsWith('data: '))
+
+                        lines.forEach(line => {
+                            try {
+                                const data = JSON.parse(line.replace('data: ', ''))
+                                result += data.content
+                                outputDiv.textContent = result + '█'    // 添加光标效果
+                            } catch (e) {
+                                errorDiv.value= "Parse failed: " + e.message
+                            }
+                        })
+                    }
+                    outputDiv.textContent = result  // 移除光标
+                } catch (e) {
+                    errorDiv.value= "Request failed: " + e.message
+                    return
+                }
+            }
+        </script>
+    </body>
+</html>
