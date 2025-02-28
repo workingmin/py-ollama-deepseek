@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
-from flask import Flask, Response, json, render_template, render_template_string, request
+from flask import Flask, Response, json, render_template, request
 from ollama import Client
 
 
