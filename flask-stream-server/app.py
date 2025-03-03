@@ -22,7 +22,7 @@ def process_message(message):
     stream = client.chat(model=ollama_model, messages=messages, stream=True)
     for chunk in stream:
         print(chunk)
-        yield f"data: {json.dumps({'content': chunk.message.content})}\n\n"
+        yield f"data: {json.dumps({'content': chunk.message.content})}\x01\x01"
     
 
 # 流式接口路由
