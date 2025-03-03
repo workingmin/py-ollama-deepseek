@@ -48,7 +48,7 @@
                             break;
 
                         const chunk = decoder.decode(value)
-                        const lines = chunk.split('\x01\x01').filter(line => line.startsWith('data: '))
+                        const lines = chunk.split('\n\n').filter(line => line.startsWith('data: '))
 
                         lines.forEach(line => {
                             try {

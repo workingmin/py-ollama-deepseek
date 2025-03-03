@@ -22,7 +22,7 @@ def process_message(message):
     stream = client.chat(model=ollama_model, messages=messages, stream=True)
     for chunk in stream:
         print(chunk)
-        yield f"data: {json.dumps({'content': chunk.message.content})}\x01\x01"
+        yield f"data: {json.dumps({'content': chunk.message.content})}\n\n"
     
 
 # 流式接口路由
@@ -33,8 +33,10 @@ def stream():
     return Response(
         process_message(message),  # 调用生成器函数
         mimetype='text/event-stream',
-        headers={'Cache-Control': 'no-cache'}
-    )
+        headers={
+            'Cache-Control': 'no-cache'
+            }
+        )
 
 # 前端页面路由
 @app.route('/')
